@@ -1,4 +1,3 @@
 Chatterbox Challenge
 ====================
 Ruby challenge.
----------------
