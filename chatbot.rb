@@ -1,11 +1,34 @@
 require 'colorize'
+require_relative 'RESPONSES'
 
 def get_response(input)
-  key = RESPONSES.keys.select {|k| /#{k}/ =~ input }.sample
-  /#{key}/ =~ input
+  key = RESPONSES.keys.select {|k| /#{k}/i =~ input }.sample
+  /#{key}/i =~ input
   response = RESPONSES[key]
-  response.nil? ? 'sorry?'.blue : response % { c1: $1, c2: $2, c3: $3}
+  response.nil? ? add_phrase : response % { c1: $1, c2: $2, c3: $3}
 end
+
+def add_phrase
+  puts 'I don\'t know what you\'re talking about, do you want me to learn? please say \'yes\''.green
+  prompt_human
+  answer = gets.chomp
+  if answer == 'yes'
+    prompt_bot
+    puts 'Great! What do you want me to add?'.green
+    prompt_human
+    key = gets.chomp
+    prompt_bot
+    puts 'And how do you want me to reply?'.green
+    prompt_human
+    value = gets.chomp
+    prompt_bot
+    puts 'Thanks! Next time I\'ll be able to answer'.green
+    RESPONSES[key] = value
+  else
+    puts 'Keep it for yourself then!!'.green
+  end
+end
+
 
 def prompt_human
   print 'Human: '
@@ -15,44 +38,32 @@ def prompt_bot
   print 'Bot: '.green
 end
 
-
-
-RESPONSES = { 'goodbye' => 'bye',
-              'sayonara' => 'sayonara',
-              'the weather is (.*)' => 'I hate it when it\'s %{c1}',
-              'I love (.*)' => 'I love %{c1} too',
-              'I groove to (.*) and (.*)' => 'I love %{c1} but I hate %{c2}',
-              'how are you?' => 'I\'m fine, thanks. And you?',
-              'I\'m good' => 'Glad to hear that',
-              'I would like to (.*)' => 'Let\'s %{c1} together!',
-              '(.*) is a great animal, better than (.*)' => 'do you really think that %{c1} is better than %{c2}??',
-              'anyway my surname is (.*)' => 'Oh sorry Mr. %{c1}!',
-              'I\'m going to (.*) some (.*) and (.*)' => 'cool, can you %{c1} some for me as well? I need %{c2} and %{c3}',
-              'tonight there it will be a nice (.*), shall we think about?' => 'no! I don\'t really like %{c1}.'}
-
-
-f = File.new("RESPONSES", "w")
-
-File.open 'RESPONSES',  'w' do |file|
-
-prompt_bot
-puts "Hello, what's your name?".green
-file.puts "Hello, what's your name?".green
-prompt_human
-name = gets.chomp
-file.puts "#{name}"
-prompt_bot
-puts "Hello #{name}".green
-file.puts "Hello #{name}".green
-prompt_human
-while(input = gets.chomp) do
-  file.puts input
+def welcome
   prompt_bot
-  puts get_response(input).green
-  file.puts get_response(input).green
+  puts "Hello, what's your name?".green
   prompt_human
-  if input == 'quit'
-  	break
-  end
+  name = gets.chomp
+  prompt_bot
+  puts "Hello #{name}".green
 end
+
+def chat
+  prompt_human
+    while(input = gets.chomp) do
+      if input == 'quit'
+        break
+      end
+      prompt_bot
+      puts get_response(input).green
+      prompt_human
+    end
+end
+
+welcome
+chat
+
+file = File.new("RESPONSES.rb", "w")
+File.open "RESPONSES.rb", "w" do |file|
+  @file = file
+  @file.puts "RESPONSES = #{RESPONSES}"
 end
