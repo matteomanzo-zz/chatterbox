@@ -5,7 +5,7 @@ def get_response(input)
   key = RESPONSES.keys.select {|k| /#{k}/i =~ input }.sample
   /#{key}/i =~ input
   response = RESPONSES[key]
-  response.nil? ? add_phrase : response % { c1: $1, c2: $2, c3: $3}
+  response.nil? ? add_phrase : response.green % { c1: $1, c2: $2, c3: $3}
 end
 
 def add_phrase
@@ -25,7 +25,9 @@ def add_phrase
     puts 'Thanks! Next time I\'ll be able to answer'.green
     RESPONSES[key] = value
   else
+    prompt_bot
     puts 'Keep it for yourself then!!'.green
+    chat
   end
 end
 
@@ -51,10 +53,10 @@ def chat
   prompt_human
     while(input = gets.chomp) do
       if input == 'quit'
-        break
+        exit
       end
       prompt_bot
-      puts get_response(input).green
+      puts get_response(input)
       prompt_human
     end
 end
