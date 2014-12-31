@@ -1,5 +1,5 @@
 require 'colorize'
-require_relative 'RESPONSES'
+require './RESPONSES.rb'
 
 def get_response(input)
   key = RESPONSES.keys.select {|k| /#{k}/i =~ input }.sample
@@ -24,6 +24,7 @@ def add_phrase
     prompt_bot
     puts 'Thanks! Next time I\'ll be able to answer'.green
     RESPONSES[key] = value
+    store_in_file
   else
     prompt_bot
     puts 'Keep it for yourself then!!'.green
@@ -61,11 +62,13 @@ def chat
     end
 end
 
+def store_in_file
+  file = File.new("RESPONSES.rb", "w")
+    File.open "RESPONSES.rb", "w" do |file|
+    @file = file
+    @file.puts "RESPONSES = #{RESPONSES}"
+  end
+end
+
 welcome
 chat
-
-file = File.new("RESPONSES.rb", "w")
-File.open "RESPONSES.rb", "w" do |file|
-  @file = file
-  @file.puts "RESPONSES = #{RESPONSES}"
-end
